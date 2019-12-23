@@ -1,0 +1,131 @@
+---- This is SQLQuery3
+---------> EX 4 has 2 Steps !!! Select the first part and run it with f5 and then Select part 2 and do the same/
+--> It will Create a temp view.
+------> EX 8 run all together.
+----> All the rest just select one ex by one ex and it will work
+
+--ex1
+select u.FirstName , p.Text
+from Friends f join Users u on f.FriendID = u.UserID
+               join Posts p on u.UserID = p.UserID
+where f.UserID = 1
+order by PublishedDate
+
+
+--ex2
+
+go
+with GroupCounter as(
+select g.GroupID
+from Users u join GroupsDetails g on u.UserID = g.UserID
+where g.UserID = 1
+)
+
+select u.FirstName, COUNT(u.FirstName) as CountSameGroups
+from Users u join GroupsDetails g on u.UserID = g.UserID
+             join GroupCounter gc on g.GroupID = gc.GroupID
+group by u.FirstName
+having COUNT(u.FirstName) >2
+
+--ex3
+select pl.PostID, p.Text , COUNT(LikeUserID) CountOfLikes
+from Posts p join PostLike pl on p.PostID = pl.PostID
+group by pl.PostID, p.Text
+order by COUNT(LikeUserID) desc
+
+
+
+--ex4
+-- Must Run First
+------------------- Select from here and run with f5
+go
+with UserID1 as(
+select UserID, FriendID
+from Friends),
+FriendsID1 as
+(select FriendID, UserID
+from Friends)
+
+SELECT *
+  INTO #AllFriendsList
+  from (
+  SELECT * FROM [UserID1]
+UNION
+SELECT * FROM [FriendsID1]
+)a
+-----------------------------------------------> To here
+-- Must run Step num 2 !!!!!!!!!!! sapareted
+-----------------------> From here with f5
+with myFriends as
+(select FriendID
+from #AllFriendsList
+where UserID = 1)
+
+select UserID , count(FriendID) as AmountOfManualFriends
+from #AllFriendsList
+where UserID not in (select FriendID from myFriends) and UserID != 1 and FriendID in (select FriendID from myFriends)
+group by UserID
+order by UserID desc
+------------------------------------> To here
+
+--ex5
+go
+with AmountOfLikesPerUser as 
+(select p.UserID, pl.LikeUserID, count(pl.LikeUserID) as AmountOfLikes
+from Posts p join PostLike pl on p.PostID = pl.PostID
+group by p.UserID, pl.LikeUserID),
+MoreThen4Likes as
+(select *
+from AmountOfLikesPerUser
+where AmountOfLikes > 4),
+CountMessages as
+(select UserID1, UserID2, count(UserID1) as AmountOFMessages
+from Messages
+group by UserID1, UserID2),
+MaxMessages as 
+(select UserID2, max(AmountOFMessages) MaxMess
+from CountMessages
+group by UserID2)
+
+
+select m.UserID, m.LikeUserID as 'Best Friend' , AmountOfLikes, MaxMess as 'Max Messages'
+from  MoreThen4Likes m join MaxMessages ms on m.UserID = ms.UserID2
+
+
+--ex6
+with PhotoTagedAmount as
+(select PhotoID ,count(TagedUserID) AmountOfTagedUsers
+from PhotoTag 
+group by PhotoID)
+
+select pa.PhotoID, AmountOfTagedUsers, TagedUserID
+from PhotoTagedAmount pa join PhotoTag p on pa.PhotoID = p.PhotoID
+where AmountOfTagedUsers = 1
+
+
+--ex7
+
+select count(PostID) CountPost, YEAR(PublishedDate) Year
+from Posts
+group by YEAR(PublishedDate)
+
+select count(AlbumID) CountAlbums, YEAR(PublishedDate) Year
+from Albums
+group by YEAR(PublishedDate)
+
+select count(PhotoID) CountPictures, YEAR(PublishedDate) Year
+from Photos
+group by YEAR(PublishedDate)
+
+
+--ex8
+with CountLikeAndTags as
+(select pt.PhotoID, count(pt.TagedUserID) as countTags, count(pl.LikeUserID) as countLikes
+from PhotoTag pt join PhotoLike pl on pt.TagedUserID = pl.LikeUserID 
+group by pt.PhotoID)
+
+select  c.PhotoID, u.FirstName as 'Taged and Liked Photo Users Name'
+from CountLikeAndTags c join PhotoTag pt on c.PhotoID = pt.PhotoID
+                        join Users u on u.UserID = pt.TagedUserID
+where countTags > 2 and countLikes > 2
+

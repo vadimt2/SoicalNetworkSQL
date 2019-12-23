@@ -1,0 +1,309 @@
+-- Step 1 !!! -> Select only this qeury and run it with F5.
+Create Database SocialNwrkProj
+
+-- Step2 !!! -> Select only this qeury and run it with F5.
+Use SocialNwrkProj
+
+--> Go to file SQLQuery2
+
+-- This is SQLQuery2 --> Just click f5 or Excute !!! You don't need to select anything at all from the SQLQuery
+-- This SQLQuery will create Tables and Insert the data.
+----------> Don't forget to select on the Top left corner SocialNwrkProj
+-------------------------> The Next step is file SQLQuery3
+CREATE TABLE Users(
+UserID int primary key identity,
+FirstName varchar(255) not null,
+LastName varchar(255) not null,
+Gender char(1) check (Gender in ('M','F')),
+Email varchar(255) unique not null check (Email like '_%@_%._%'),
+Password varchar(255) not null,
+Birthdate Datetime not null,
+RelationshipStatus char(1) not null check (RelationshipStatus in ('U','S','M','D')),
+Country varchar(255) not null,
+City varchar(255) not null,
+Street varchar(255) not null,
+ZipCode int not null
+);
+
+INSERT INTO Users (FirstName,LastName,Gender,Email,Password,Birthdate ,RelationshipStatus ,Country,City,Street,ZipCode) Values ('Vadim', 'Tomashevsky', 'M','Vadimt2@gmail.com','aaaa','1991-05-30','S','Israel','Ashdod','dsads',7775005)
+
+INSERT INTO Users (FirstName,LastName,Gender,Email,Password,Birthdate ,RelationshipStatus ,Country,City,Street,ZipCode) Values ('Olga', 'Karanchuk', 'F','Olga@gmail.com','aaaa','1991-09-20','S','Israel','Ashdod','dasdda',323232)
+
+INSERT INTO Users (FirstName,LastName,Gender,Email,Password,Birthdate ,RelationshipStatus ,Country,City,Street,ZipCode) Values ('Nastia', 'Balchinko', 'F','Nastia@gmail.com','aaaa','1991-09-20','S','Germany','Frankfurt','dasdda',323232)
+
+INSERT INTO Users (FirstName,LastName,Gender,Email,Password,Birthdate ,RelationshipStatus ,Country,City,Street,ZipCode) Values ('Tom', 'Jones', 'M','Tom@gmail.com','aaaa','1989-09-20','M','Israel','Ashdod','dasdda',323232)
+
+INSERT INTO Users (FirstName,LastName,Gender,Email,Password,Birthdate ,RelationshipStatus ,Country,City,Street,ZipCode) Values ('Jenny', 'Jones', 'F',' Jenny@gmail.com','aaaa','1989-04-23','M','Israel','Ashdod','dasdda',323232)
+
+INSERT INTO Users (FirstName,LastName,Gender,Email,Password,Birthdate ,RelationshipStatus ,Country,City,Street,ZipCode) Values ('Max', 'Harison', 'M',' Max@gmail.com','aaaa','1992-01-23','D','Israel','Haifa','dasdda',323232)
+
+INSERT INTO Users (FirstName,LastName,Gender,Email,Password,Birthdate ,RelationshipStatus ,Country,City,Street,ZipCode) Values ('Dani', 'Harison', 'M',' Dani@gmail.com','aaaa','1992-01-23','S','Israel','Natania','dasdda',323232)
+
+
+Create Table Posts(
+PostID int primary key identity,
+UserID int REFERENCES Users(UserID),
+PublishedDate Datetime,
+Text varchar(800) not null,
+)
+
+CREATE TABLE Friends(
+UserID int references Users(UserID) not null,
+FriendID int references Users(UserID) not null,
+primary key (UserID,FriendID),
+unique (FriendID,UserID)
+)
+
+CREATE TABLE Relationship(
+UserID int references Users(UserID) not null,
+UserID2 int references Users(UserID) not null,
+Date DateTime,
+primary key (UserID,UserID2),
+unique (UserID2,UserID)
+)
+Create Table Albums(
+AlbumID int primary key identity,
+UserID int REFERENCES Users(UserID) not null,
+PostID int REFERENCES Posts(PostID) not null,
+Name varchar(255) not null,
+PublishedDate Datetime,
+Description varchar(255),
+UrlCover varchar(255)
+)
+
+
+Create Table Photos(
+PhotoID int primary key identity,
+AlbumID int REFERENCES Albums(AlbumID) not null,
+PostID int REFERENCES Posts(PostID) not null,
+UserID int REFERENCES Users(UserID) not null,
+PublishedDate Datetime not null,
+Url varchar(300) not null,
+)
+
+Create Table PhotoTag(
+PhotoID int REFERENCES Photos(PhotoID) not null,
+TagedUserID int REFERENCES Users(UserID) not null,
+Date DateTime,
+Primary key(PhotoID,TagedUserID)
+)
+
+Create Table PostLike(
+PostID int REFERENCES Posts(PostID) not null,
+LikeUserID int REFERENCES Users(UserID) not null,
+Date DateTime,
+Primary key(PostID,LikeUserID)
+)
+
+ 
+Create Table PhotoLike(
+PhotoID int REFERENCES Photos(PhotoID) not null,
+LikeUserID int REFERENCES Users(UserID) not null,
+Date DateTime,
+Primary key(PhotoID,LikeUserID)
+)
+
+Create Table AlbumLike(
+AlbumID int REFERENCES Albums(AlbumID) not null,
+LikeUserID int REFERENCES Users(UserID) not null,
+Date DateTime,
+Primary key(AlbumID,LikeUserID)
+)
+
+Create Table Messages(
+ MessageID int Primary key identity,
+ UserID1 int REFERENCES Users(UserID),
+ UserID2 int REFERENCES Users(UserID),
+ Message varchar(800) not null,
+ Date DateTime
+)
+
+
+Create Table Groups(
+ GroupID int Primary key identity,
+ Name varchar(255) not null,
+ CategoryName varchar(255) not null,
+ --UserID int REFERENCES Users(UserID),
+ CreatedDate DateTime
+)
+
+Create Table GroupManager(
+ GroupID int REFERENCES Groups(GroupID),
+ AccsesType varchar(255) not null check(AccsesType IN ('Admin')),
+ UserID int REFERENCES Users(UserID),
+ Primary key(GroupID,UserID),
+ Date DateTime
+)
+
+
+Create Table GroupsDetails(
+ GroupID int references Groups(GroupID),
+ UserID int references Users(UserID),
+ JoinDate DateTime
+)
+
+
+INSERT INTO Posts (UserID,PublishedDate,Text)
+Values (1, GETDATE(),'This is an amazing day for sql')
+
+INSERT INTO Posts (UserID,PublishedDate,Text)
+Values (1, GETDATE(),'Today i had a great date posting posts')
+
+INSERT INTO Posts (UserID,PublishedDate,Text)
+Values (3,'2018-06-20','i want to get Pizza')
+
+INSERT INTO Posts (UserID,PublishedDate,Text)
+Values (2, GETDATE(),'Ollala my first post')
+
+
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (6,'2015-08-06', 'Hello')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (7,'2009-01-15', 'My first post')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (6,'2012-01-05', 'WHY')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (1,'2010-01-25', 'SQL')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (1,'2011-04-25', 'DBL')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (1,'2011-07-25', 'AT THE BEACH')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (3,'2012-09-28', 'MIAMI')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (3,'2017-11-20', 'FOR1')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (3,'2012-12-28', 'GO')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (3,'2012-09-28', 'GDFGDD')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (5,'2011-12-01', 'WHAT?')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (7,'2016-12-21', 'why?')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (7,'2016-12-21', 'ok')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (7,'2016-12-21', 'fine')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (7,'2016-12-21', 'just')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (7,'2016-12-21', 'mmmm')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (7,'2016-12-21', 'shure?')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (7,'2016-12-21', 'noooo?')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (7,'2016-12-21', 'happy?')
+INSERT INTO Posts (UserID, PublishedDate, Text) VALUES (5, getdate(), 'Pic of 3 of us')
+
+
+INSERT INTO Relationship (UserID,UserID2,Date) Values (4,5,GetDATE())
+
+INSERT INTO Friends(UserID,FriendID) Values (1,2)
+INSERT INTO Friends(UserID,FriendID) Values (1,3)
+INSERT INTO Friends(UserID,FriendID) Values (1,4)
+INSERT INTO Friends(UserID,FriendID) Values (2,3)
+INSERT INTO Friends(UserID,FriendID) Values (4,5)
+insert into Friends (UserID,FriendID) values (7, 2)
+insert into Friends (UserID,FriendID) values (7, 3)
+insert into Friends (UserID,FriendID) values (7, 4)
+insert into Friends (UserID,FriendID) values (7, 5)
+insert into Friends (UserID,FriendID) values (7, 6)
+
+
+INSERT INTO Groups(Name,CategoryName,CreatedDate) values ('Bmw','Cars',GETDATE())
+INSERT INTO Groups(Name,CategoryName,CreatedDate) values ('Ebay','Sales',GETDATE())
+INSERT INTO Groups(Name,CategoryName,CreatedDate) values ('Pubg','Games',GETDATE())
+
+INSERT INTO GroupManager(GroupID,AccsesType,UserID,Date) values (1,'Admin',3,getdate())
+INSERT INTO GroupManager(GroupID,AccsesType,UserID,Date) values (2,'Admin',4,getdate())
+INSERT INTO GroupManager(GroupID,AccsesType,UserID,Date) values (3,'Admin',1,getdate())
+
+
+
+INSERT INTO GroupsDetails(GroupID,UserID,JoinDate) values (1,4,GETDATE())
+INSERT INTO GroupsDetails(GroupID,UserID,JoinDate) values (1,5,GETDATE())
+INSERT INTO GroupsDetails(GroupID,UserID,JoinDate) values (1,3,GETDATE())
+INSERT INTO GroupsDetails(GroupID,UserID,JoinDate) values (1,1,GETDATE())
+INSERT INTO GroupsDetails(GroupID,UserID,JoinDate) values (2,1,GETDATE())
+INSERT INTO GroupsDetails(GroupID,UserID,JoinDate) values (3,5,GETDATE())
+INSERT INTO GroupsDetails(GroupID,UserID,JoinDate) values (2,2,GETDATE())
+INSERT INTO GroupsDetails(GroupID,UserID,JoinDate) values (3,1,GETDATE())
+INSERT INTO GroupsDetails(GroupID,UserID,JoinDate) values (3,2,GETDATE())
+INSERT INTO GroupsDetails(GroupID,UserID,JoinDate) values (2,5,GETDATE())
+
+
+INSERT INTO PostLike (PostID,LikeUserID,Date) values (2,1,GETDATE())
+INSERT INTO PostLike (PostID,LikeUserID,Date) values (3,1,GETDATE())
+INSERT INTO PostLike (PostID,LikeUserID,Date) values (3,2,GETDATE())
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (11,1,GETDATE())
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (12,1,GETDATE())
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (13,1,GETDATE())
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (14,1,GETDATE())
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (7,7,GETDATE()) -- 6
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (4,3,GETDATE()) -- 2
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (4,1,GETDATE()) -- 2
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (4,7,GETDATE()) -- 2
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (15,4,GETDATE()) -- 5
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (15,7,GETDATE()) -- 5
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (6,6,GETDATE()) --7
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (16,6,GETDATE()) 
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (17,6,GETDATE()) 
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (18,6,GETDATE()) 
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (19,6,GETDATE()) 
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (20,6,GETDATE()) 
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (21,6,GETDATE()) 
+Insert into PostLike (PostID,LikeUserID,Date) VALUES (22,6,GETDATE())
+
+
+Insert into Albums (UserID,PostID,Name,Description,PublishedDate,UrlCover) VALUES (1,1,'MyAlbum','Me and Family',GETDATE(),'https://mypic.jpg')
+Insert into Albums (UserID,PostID,Name,Description,PublishedDate,UrlCover)VALUES (5,15,'Friends','Me and BFF',GETDATE(),'https://mypic.jpg')
+Insert into Albums (UserID,PostID,Name,Description,PublishedDate,UrlCover) VALUES (3,3,'Arts','myArts','2015-04-23','https://mypic.jpg')
+Insert into Albums (UserID,PostID,Name,Description,PublishedDate,UrlCover) VALUES (6,5,'Arts','myArts','2013-08-21','https://mypic.jpg')
+Insert into Albums (UserID,PostID,Name,Description,PublishedDate,UrlCover) VALUES (5,24,'FriendsAlbum','My Best friends pic',getdate(),'https://mypic.jpg')
+
+insert into Photos (AlbumID,PostID,UserID, Url, PublishedDate) VALUES (1,1,1,'Https://pic1.jpg',GETDATE())
+insert into Photos (AlbumID,PostID,UserID, Url, PublishedDate) VALUES (2,15,5,'Https://pic1.jpg','2013-08-21')
+insert into Photos (AlbumID,PostID,UserID, Url, PublishedDate) VALUES (3,3,3,'Https://pic1.jpg','2015-04-23')
+insert into Photos (AlbumID,PostID,UserID, Url, PublishedDate) VALUES (4,5,6,'Https://pic123.jpg',GETDATE())
+insert into Photos (AlbumID,PostID,UserID, Url, PublishedDate) VALUES (3,3,3,'Https://pic123.jpg',GETDATE())
+insert into Photos (AlbumID,PostID,UserID, Url, PublishedDate) VALUES (5,24,5,'Https://friendspic.jpg',GETDATE())
+
+
+insert into Messages (UserID1, UserID2,Message,Date) values (1,3,'a0',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (1,3,'a1',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (1,3,'a2',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (1,3,'a3',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (1,3,'a4',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (1,3,'a5',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (1,3,'a6',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (4,5,'b1',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (4,5,'b2',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (4,5,'b3',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (4,5,'b4',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (6,2,'c1',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (6,2,'c2',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (6,2,'c3',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (6,2,'c4',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (6,2,'c5',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (6,2,'c6',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (6,7,'l1',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (6,7,'l2',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (6,7,'l3',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (6,7,'l4',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (6,7,'l5',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (3,1,'d1',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (3,1,'d2',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (1,2,'n1',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (1,2,'n2',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (1,2,'n3',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (2,3,'k1',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (2,3,'k2',GETDATE())
+insert into Messages (UserID1, UserID2,Message,Date) values (4,7,'fdgdg',GETDATE())
+
+
+-- taged photos only user id 2 pohoto id 1,5
+insert into PhotoTag (PhotoID, TagedUserID, Date) Values (1,2,GETDATE())
+insert into PhotoTag (PhotoID, TagedUserID, Date) Values (5,2,GETDATE())
+
+--
+insert into PhotoTag (PhotoID, TagedUserID, Date) Values (2,2,GETDATE())
+insert into PhotoTag (PhotoID, TagedUserID, Date) Values (2,3,GETDATE())
+insert into PhotoTag (PhotoID, TagedUserID, Date) Values (2,6,GETDATE())
+--
+insert into PhotoTag (PhotoID, TagedUserID, Date) Values (4,1,GETDATE())
+insert into PhotoTag (PhotoID, TagedUserID, Date) Values (4,3,GETDATE())
+--
+insert into PhotoTag (PhotoID, TagedUserID, Date) Values (3,2,GETDATE())
+insert into PhotoTag (PhotoID, TagedUserID, Date) Values (3,7,GETDATE())
+insert into PhotoTag (PhotoID, TagedUserID, Date) Values (3,5,GETDATE())
+
+insert into PhotoTag (PhotoID, TagedUserID, Date) Values (6,4,GETDATE())
+insert into PhotoTag (PhotoID, TagedUserID, Date) Values (6,6,GETDATE())
+insert into PhotoTag (PhotoID, TagedUserID, Date) Values (6,7,GETDATE())
+
+
+insert into PhotoLike (PhotoID,LikeUserID,Date) values (6,4,GETDATE())
+insert into PhotoLike (PhotoID,LikeUserID,Date) values (6,6,GETDATE())
+insert into PhotoLike (PhotoID,LikeUserID,Date) values (6,7,GETDATE())
